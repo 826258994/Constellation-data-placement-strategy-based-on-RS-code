@@ -6,18 +6,18 @@ New_Population = Population;
 
 %% 基本思路如下：为了确保种群的多样性，采用一对一替换机制。只有后代表现强于父代才会发生替换。
 for i=1:N
-    p_penaty = Population(i).penaty;
-    c_penaty = Offspring(i).penaty;
+    p_penalty = Population(i).penalty;
+    c_penalty = Offspring(i).penalty;
     p_fitness = Population(i).fitness;
     c_fitness = Offspring(i).fitness;
-    if p_penaty == c_penaty % 如果罚函数相等就比较适应度
+    if p_penalty == c_penalty % 如果罚函数相等就比较适应度
         if p_fitness < c_fitness
             New_Population(i) = Population(i);
         else
             New_Population(i) = Offspring(i);
         end
     else                      % 如果罚函数不等就选罚函数小的
-        if p_penaty < c_penaty
+        if p_penalty < c_penalty
             New_Population(i) = Population(i);
         else
             New_Population(i) = Offspring(i);

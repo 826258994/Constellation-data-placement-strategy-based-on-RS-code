@@ -24,7 +24,7 @@ G_best = Population(1);
 G_best.fitness = 1e8;
 %初始化个体最优
 P_best = Population;
-epoch_best(1) = G_best; %每次迭代的最优解
+epoch_best = repmat(G_best,1,T); %每次迭代的最优解
 v = 10*rand(particle_size,SG.r)-5;
 %% 开始迭代
 iter = 1;
@@ -32,29 +32,29 @@ while iter <= T
     % 选取个体最优适应度及位置
     for i = 1 : particle_size %遍历种群里的粒子
         % 情况1，当前粒子和历史都满足约束条件，直接比较适应度大小
-        if P_best(i).penaty <= err && Population(i).penaty <= err
+        if P_best(i).penalty <= err && Population(i).penalty <= err
             if Population(i).fitness < P_best(i).fitness
                 P_best(i) = Population(i);
             end
         end
         % 情况2，历史可行，当前不可行，不执行操作（选历史）
-        if P_best(i).penaty <= err && Population(i).penaty > err   
+        if P_best(i).penalty <= err && Population(i).penalty > err   
         end
         % 情况3，当前可行，历史不可行，选当前
-        if P_best(i).penaty > err && Population(i).penaty <= err  
+        if P_best(i).penalty > err && Population(i).penalty <= err  
             P_best(i) = Population(i);
         end
         % 情况4，当前和历史都不可行，选罚函数小的
-        if P_best(i).penaty > err && Population(i).penaty > err  
-            if Population(i).penaty < P_best(i).penaty
+        if P_best(i).penalty > err && Population(i).penalty > err  
+            if Population(i).penalty < P_best(i).penalty
                 P_best(i) = Population(i);
             end 
         end
     end
     % 选取群体最优适应度及位置
     % 情况1，都满足约束，找最佳适应度
-    if G_best.penaty <= err && min([P_best.penaty]) <= err 
-        index1 = [P_best.penaty] == 0;
+    if G_best.penalty <= err && min([P_best.penalty]) <= err 
+        index1 = [P_best.penalty] == 0;
         Pbst_suit = P_best(index1);
         if ~isempty(Pbst_suit)
             [~,index2] = sort([Pbst_suit.fitness]);
@@ -64,8 +64,8 @@ while iter <= T
         end
     end
     % 情况2，历史全局不满足约束条件，局部里有满足的，直接用局部里适应度最佳的粒子替代群体最佳
-    if G_best.penaty > err && min([P_best.penaty]) <= err 
-        index1 = [P_best.penaty] == 0;
+    if G_best.penalty > err && min([P_best.penalty]) <= err 
+        index1 = [P_best.penalty] == 0;
         Pbst_suit = P_best(index1);
         if ~isempty(Pbst_suit)
             [~,index2] = sort([Pbst_suit.fitness]);
@@ -74,9 +74,9 @@ while iter <= T
     end
     % 情况3，历史种群最佳满足，当前局部不满足，不做更新
     % 情况4，都不满足约束条件，选罚函数小的
-    if G_best.penaty > err && min([P_best.penaty]) > err 
-        [p_e, i_m] = min([P_best.penaty]);
-        if p_e < G_best.penaty
+    if G_best.penalty > err && min([P_best.penalty]) > err 
+        [p_e, i_m] = min([P_best.penalty]);
+        if p_e < G_best.penalty
             G_best = P_best(i_m);
         end
     end
@@ -85,6 +85,9 @@ while iter <= T
     %w = w_max-w_max*(iter/T);%使w的值随迭代次数增大不断递减，提高其局部搜索能力，加快收敛
     w_start = 0.9; w_end = 0.4; k_control = 0.6;
     w = (w_start - w_end) * tan(0.875*(1-(iter/T)^k_control)) + w_end;
+    
+    x = zeros(particle_size,SG.r); %预分配内存
+    partbest_x = zeros(particle_size,SG.r); %预分配内存
     for i = 1 : particle_size
         x(i,:) = Population(i).x;
         partbest_x(i,:) = P_best(i).x;

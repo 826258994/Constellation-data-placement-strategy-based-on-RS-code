@@ -1,5 +1,5 @@
 % SG.alph,SG.c,SG.tao_max,SG.l_intra,SG.l_inter,SG.Pt_intra,SG.Pt_inter,SG.C_intra,SG.C_inter,SG.M,SG.data_pos,SG.idle_pos,SG.d,SG.k,x
-function up_Population = penalty(SG,Population)
+function update_Population = penalty(SG,Population)
 
 %% 罚函数，降级读取时延超过约束上限的大小
 for n = 1 : size(Population,2)
@@ -45,7 +45,7 @@ for n = 1 : size(Population,2)
         end
         tao_retrv(i) = max(tao_i);
     end
-    Population(n).penaty = sum(max(0,tao_retrv - SG.tao_max));
+    Population(n).penalty = sum(max(0,tao_retrv - SG.tao_max));
 end
-up_Population = Population;
+update_Population = Population;
 end
